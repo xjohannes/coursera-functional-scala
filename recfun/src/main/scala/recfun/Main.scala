@@ -16,27 +16,31 @@ object Main {
     * Exercise 3
     */
   def countChange(money: Int, coins: List[Int]): Int = {
-    def change(amount: Int, coins: List[Int], n: Int): Int =
+    def change(amount: Int, coins: List[Int], n: Int, pointer:Int): Int =
       if(coins.isEmpty) 0 else {
         if(amount <= 0) {
           if(amount == 0) {
-            if(n == 0) 1 + change(money, checkN(coins.tail), newN(money, coins.tail), 1) else 1 + change(money, coins, n -1)
-          } else 0 + change(money, checkN(coins), newN(money, coins.tail))
+            if(n == 0) 1 + change(money, checkN(coins.tail), newN(money, coins.tail), 0) else 1 + change(money, coins, n - 1, pointer)
+          } else change(money, checkN(coins), newN(money, coins.tail), 0)
         } else {
-          if(n == 0) change(amount, coins.tail, newN(amount, coins.tail)) else {
-            changeMoney(amount - (coins.head * n), coins, newN(amount - (coins.head * n), coins.tail), 1) //toDo 1 == currentListPointer, how to calculate it
+          if(n == 0) change(amount, checkN(coins.tail), newN(amount, coins.tail), 0) else {
+            change(subtract(amount, coins, n, pointer), coins, n - 1, pointer + 1)
           }
         }
     }
-    def checkN(coinsTail:List[Int]):List[Int] =
-      if(coinsTail.isEmpty) Nil else coinsTail
+    def subtract(amount: Int, coins: List[Int], n:Int, pointer: Int): Int =
+      if(pointer < coins.length)
+        amount - (coins(pointer) * n)
+      else 0
+
+    def checkN(coins:List[Int]):List[Int] =
+      if(coins.isEmpty) Nil else coins
 
     def newN(money: Int, coins: List[Int]): Int =
       if(money <= 0 || coins.isEmpty || coins.head == 0) 0
       else (money/ coins.head).floor.toInt
-    def changeMoney(amount: Int, coins: List[Int], n: Int, currentListPointer: Int): Int = ???
 
-    if(money != 0) change(money, coins.sorted.reverse, newN(money, coins.sorted.reverse)) else 0
+    if(money != 0) change(money, coins.sorted.reverse, newN(money, coins.sorted.reverse), 0) else 0
   }
 
   /**
